@@ -15,7 +15,7 @@ $ cd data/
 $ bash download_ucf101.sh     # Downloads the UCF-101 dataset (~7.2 GB)
 $ unrar x UCF101.rar          # Unrars dataset
 $ unzip ucfTrainTestlist-RecognitionTask.zip  # Unzip train / test split
-$ python3 extract_frames.py   # Extracts frames from the video (~26.2 GB, go grab a coffee for this)
+$ python3 extract_frames.py   # Extracts frames from the video (~26.2 GB, go grab lunch for this)
 ```
 
 ## ConvLSTM
