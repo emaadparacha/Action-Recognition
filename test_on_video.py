@@ -25,11 +25,11 @@ if __name__ == "__main__":
     assert opt.checkpoint_model, "Specify path to checkpoint model using arg. '--checkpoint_model'"
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    input_shape = (opt.channels, opt.image_dim, opt.image_dim)
+    input_shape2 = (opt.channels, opt.image_dim, opt.image_dim)
 
     transform = transforms.Compose(
         [
-            transforms.Resize(input_shape[-2:], Image.BICUBIC),
+            transforms.Resize(input_shape2[-2:], Image.BICUBIC),
             transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
         ]
@@ -46,7 +46,8 @@ if __name__ == "__main__":
     # Extract predictions
     output_frames = []
     time_left = 0
-    for frame in tqdm.tqdm(extract_frames(opt.video_path, time_left), desc="Processing frames"):
+    predictionarray = []
+    for frame in tqdm.tqdm(extract_frames(opt.video_path,time_left), desc="Processing frames"):
         image_tensor = Variable(transform(frame)).to(device)
         image_tensor = image_tensor.view(1, 1, *image_tensor.shape)
 
@@ -54,6 +55,8 @@ if __name__ == "__main__":
         with torch.no_grad():
             prediction = model(image_tensor)
             predicted_label = labels[prediction.argmax(1).item()]
+
+        predictionarray.append(predicted_label)
 
         # Draw label on frame
         d = ImageDraw.Draw(frame)
@@ -66,3 +69,6 @@ if __name__ == "__main__":
     for frame in tqdm.tqdm(output_frames, desc="Writing to video"):
         writer.writeFrame(np.array(frame))
     writer.close()
+
+    most_likely = max(set(predictionarray), key=predictionarray.count)
+    print ("This video is most likely",most_likely)
